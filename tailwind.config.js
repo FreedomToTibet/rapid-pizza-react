@@ -6,7 +6,6 @@ export default {
     fontFamily: {
       sans: 'Roboto Mono, monospace',
     },
-
     extend: {
       fontSize: {
         huge: ['80rem', { lineHeight: '1' }],
@@ -16,5 +15,17 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.scrollbar-hide': {
+          'scrollbar-width': 'none',
+          '-ms-overflow-style': 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+        },
+      });
+    },
+  ],
 };

@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Outlet, useNavigation } from "react-router-dom";
 
 import CartOverview from "../features/cart/CartOverview";
@@ -11,14 +10,14 @@ const AppLayout = () => {
 	const isLoading = navigation.state === "loading";
 
 	return (
-		<div className="grid grid-row-[auto_1fr_auto] h-screen">
+		<div className="grid h-screen grid-rows-[5rem_1fr_auto] scrollbar-hide">
 			{isLoading && <Loader />}
 			<Header />
-			<Fragment className="overflow-scroll">
+			<div className="overflow-y-scroll scrollbar-hide">
 				<main className="mx-auto max-w-3xl">
 					<Outlet />
 				</main>
-			</Fragment>
+			</div>
 			
 			<CartOverview />
 		</div>

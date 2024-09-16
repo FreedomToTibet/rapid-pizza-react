@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
@@ -34,6 +34,7 @@ const fakeCart = [
 ];
 
 const CreateOrder = () =>{
+	const username = useSelector((state) => state.user.username);
 	const navigation = useNavigation();
 	const isSubmitting = navigation.state === "submitting";
 	
@@ -49,7 +50,7 @@ const CreateOrder = () =>{
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">First Name</label>
-          <input className="input grow" type="text" name="customer" required />
+          <input className="input grow" type="text" name="customer" defaultValue={username} required />
         </div>
 
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -81,7 +82,7 @@ const CreateOrder = () =>{
 
         <div>
 					<input name="cart" type="hidden" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmitting}>{isSubmitting ? "Placing order..." : "Order now"}</Button>
+          <Button disabled={isSubmitting} type="primary">{isSubmitting ? "Placing order..." : "Order now"}</Button>
         </div>
       </Form>
     </div>
