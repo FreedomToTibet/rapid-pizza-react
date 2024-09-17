@@ -1,29 +1,64 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getAddress } from "../../services/apiGeocoding";
 
-// function getPosition() {
-//   return new Promise(function (resolve, reject) {
-//     navigator.geolocation.getCurrentPosition(resolve, reject);
-//   });
-// }
+const getPosition = () => {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log("Position data:", position);
+        resolve(position);
+      },
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            reject(new Error("User denied the request for Geolocation."));
+            break;
+          case error.POSITION_UNAVAILABLE:
+            // Fallback to a default location
+            resolve({
+              coords: {
+                latitude: 49.2827, // Example: Vancouver, BC
+                longitude: -123.1207,
+              },
+            });
+            break;
+          case error.TIMEOUT:
+            reject(new Error("The request to get user location timed out."));
+            break;
+          default:
+            reject(new Error("An unknown error occurred."));
+            break;
+        }
+      }
+    );
+  });
+}
 
-// async function fetchAddress() {
-//   // 1) We get the user's geolocation position
-//   const positionObj = await getPosition();
-//   const position = {
-//     latitude: positionObj.coords.latitude,
-//     longitude: positionObj.coords.longitude,
-//   };
+export const fetchAddress = createAsyncThunk("userFetchAddress", async () => {
+  try {
+    const positionObj = await getPosition();
+    const position = {
+      latitude: positionObj.coords.latitude,
+      longitude: positionObj.coords.longitude,
+    };
 
-//   // 2) Then we use a reverse geocoding API to get a description of the user's address, so we can display it the order form, so that the user can correct it if wrong
-//   const addressObj = await getAddress(position);
-//   const address = `${addressObj?.locality}, ${addressObj?.city} ${addressObj?.postcode}, ${addressObj?.countryName}`;
+    const addressObj = await getAddress(position);
+    const address = `${addressObj?.locality}, ${addressObj?.city} ${addressObj?.postcode}, ${addressObj?.countryName}`;
 
-//   // 3) Then we return an object with the data that we are interested in
-//   return { position, address };
-// }
+    return { position, address };
+  } catch (error) {
+    console.error("Error fetching address:", error);
+    throw error;
+  }
+});
+
 
 const initialState = {
 	username: "",
+	status: "idle",
+	position: {},
+	address: "",
+	error: "",
 };
 
 const userSlice = createSlice({
@@ -34,6 +69,18 @@ const userSlice = createSlice({
 			state.username = action.payload;
 		},
 	},
+	extraReducers: (builder) => {
+			builder
+				.addCase(fetchAddress.pending, (state) => ({ ...state, status: 'loading' }))
+				.addCase(fetchAddress.fulfilled, (state, action) => {
+					state.position = action.payload.position;
+					state.address = action.payload.address;
+					state.status = "idle";
+				})
+				.addCase(fetchAddress.rejected, (state) => ({
+					...state, status: "error", error: 'There was a problem getting your address'
+				}));
+		},
 });
 
 export const { setUser } = userSlice.actions;

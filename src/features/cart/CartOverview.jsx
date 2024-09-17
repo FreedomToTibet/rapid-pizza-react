@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { getHowManyPizzas, getTotalPrice, getCart } from './cartSlice';
+import { getHowManyPizzas, getTotalPrice } from './cartSlice';
 import { formatCurrency } from "../../utils/helpers";
 
 const CartOverview = () => {
