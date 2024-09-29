@@ -6,7 +6,7 @@
 - add to your order priority;
 - use geolocation to auto fill in the delivery address.
 
-This Single Page Application (SPA) uses react-fast-pizza-api.onrender.com/api a database.
+This Single Page Application (SPA) uses react-fast-pizza-api.onrender.com/api as database.
 
 ### Technologies used in development:
 
